@@ -1,0 +1,205 @@
+Option Explicit
+
+Private Sub CommandButton1_Click()
+ Sheet2.Rows.Clear
+ Sheet3.Range(Sheet3.Range("A2:P2"), Sheet3.Range("A2:P2").End(xlDown)).ClearContents
+ Sheet4.Rows.Clear
+ Sheet5.Rows.Clear
+ MsgBox ("Cleanning")
+End Sub
+
+
+
+Private Sub ExportTracks_Click()
+Dim lRow As Long
+Dim lCol As Long
+Dim rowExportTracks As Long
+Dim StrResult As String
+Dim iStart As Integer
+Dim iFinish As Integer
+Dim iRound As Integer
+Dim iBlock As Integer
+Dim iCountOfBlock As Integer
+Dim j, k, m As Integer
+Dim StrResultArr
+'Find the last non-blank cell in column A(1)
+    lRow = Sheet2.Cells(Rows.Count, 1).End(xlUp).Row
+    'Find the last non-blank cell in row 1
+    lCol = Sheet2.Cells(1, Columns.Count).End(xlToLeft).Column
+    'MsgBox "Last Row: " & lRow & vbNewLine & "Last Column: " & lCol
+ StrResult = ""
+ Sheet3.Range(Sheet3.Range("A2:P2"), Sheet3.Range("A2:P2").End(xlDown)).ClearContents
+ rowExportTracks = 1
+ iBlock = 1
+ For j = 6 To lRow
+'For j = 6 To 222
+'Tim diem iStart block
+If InStr(UCase(Sheet2.Cells(j, 1).Value), UCase("TIME   Frac_Matrx")) > 0 Then
+     'Bat dau block tai j+2
+     iStart = j + 2
+     'MsgBox (iStart)
+End If
+'Tim diem iFinish cua block
+If Sheet2.Cells(j, 1).Value = "" Then
+    'MsgBox (Sheet2.Cells(j, 1).Value)
+    If InStr(UCase(Sheet2.Cells(j + 1, 1).Value), "=== TRACKED") > 0 Then
+     'Bat dau block tai j+2
+        iFinish = j - 1
+        'MsgBox (iFinish)
+        StrResult = ""
+        For k = iStart To iFinish
+            rowExportTracks = rowExportTracks + 1
+            StrResult = Application.WorksheetFunction.Trim(Sheet2.Cells(k, 1).Value)
+            StrResult = Replace(StrResult, "( ", "(")
+            StrResult = Replace(StrResult, ", ", ",")
+            StrResult = Replace(StrResult, ", ", ",")
+            StrResultArr = Split(StrResult, " ")
+            Sheet3.Cells(rowExportTracks, 1) = iBlock
+            Sheet3.Cells(rowExportTracks, 2) = StrResultArr(0)
+            Sheet3.Cells(rowExportTracks, 3) = StrResultArr(1)
+            Sheet3.Cells(rowExportTracks, 4) = StrResultArr(2)
+            Sheet3.Cells(rowExportTracks, 5) = StrResultArr(3)
+            Sheet3.Cells(rowExportTracks, 6) = StrResultArr(4)
+            Sheet3.Cells(rowExportTracks, 7) = StrResultArr(5)
+            Sheet3.Cells(rowExportTracks, 8) = StrResultArr(7)
+            Sheet3.Cells(rowExportTracks, 9) = StrResultArr(8)
+            'Sheet3.Cells(rowExportTracks, 9) = Replace(Replace(StrResultArr(8), "(", ""), ",", "")
+            'Sheet3.Cells(rowExportTracks, 10) = Split(StrResultArr(9), ",")(0)
+            'Sheet3.Cells(rowExportTracks, 11) = Replace(Split(StrResultArr(9), ",")(1), ")", "")
+            
+            'Tinh toan cac chi so  Distance
+            
+            If Sheet3.Cells(rowExportTracks, 2).Value = 0 Then
+                Sheet3.Cells(rowExportTracks, 12) = 0
+                Sheet3.Cells(rowExportTracks, 13) = 0
+                Sheet3.Cells(rowExportTracks, 14) = Sheet3.Cells(rowExportTracks, 8) * Sheet3.Cells(2, 17)
+                Sheet3.Cells(rowExportTracks, 15) = Sheet3.Cells(rowExportTracks, 12) / Sheet3.Cells(rowExportTracks, 14)
+                Sheet3.Cells(rowExportTracks, 16) = Round(Sheet3.Cells(rowExportTracks, 15), 0)
+            Else
+                Sheet3.Cells(rowExportTracks, 12) = Sqr((Sheet3.Cells(rowExportTracks - 1, 5) - Sheet3.Cells(rowExportTracks, 5)) ^ 2 + (Sheet3.Cells(rowExportTracks - 1, 6) - Sheet3.Cells(rowExportTracks, 6)) ^ 2 + (Sheet3.Cells(rowExportTracks - 1, 7) - Sheet3.Cells(rowExportTracks, 7)) ^ 2)
+                Sheet3.Cells(rowExportTracks, 13) = Sheet3.Cells(rowExportTracks - 1, 13) + Sheet3.Cells(rowExportTracks, 12)
+                Sheet3.Cells(rowExportTracks, 14) = Sheet3.Cells(rowExportTracks, 8) * Sheet3.Cells(2, 17)
+                Sheet3.Cells(rowExportTracks, 15) = Sheet3.Cells(rowExportTracks, 12) / Sheet3.Cells(rowExportTracks, 14)
+                Sheet3.Cells(rowExportTracks, 16) = Round(Sheet3.Cells(rowExportTracks, 15), 0)
+            End If
+        Next k
+        iBlock = iBlock + 1
+    End If
+End If
+Next j
+MsgBox ("Done file ExportTracks")
+End Sub
+Private Sub PHREEQCInput_Click()
+Dim lRow As Long
+Dim lCol As Long
+Dim WrdArray() As String
+Dim strg_BrE As String
+Dim strg_NAmE As String
+Dim strSpelling_BrE As String
+Dim strSpelling_NAmE As String
+Dim StrResult As String
+Dim StrResultSheet3 As String
+Dim iStart As Integer
+Dim iFinish As Integer
+Dim iRound As Integer
+Dim iBlock As Integer
+Dim iCountOfBlock As Integer
+Dim iCountOfBlockSheet3 As Integer
+Dim iSumRow As Double
+Dim iSumColunm As Double
+Dim iLastOfRow As Double
+Dim j, k, m As Integer
+ 'Find the last non-blank cell in column A(1)
+    lRow = Sheet3.Cells(Rows.Count, 1).End(xlUp).Row
+    'Find the last non-blank cell in row 1
+    lCol = Sheet3.Cells(1, Columns.Count).End(xlToLeft).Column
+    'MsgBox "Last Row: " & lRow & vbNewLine & "Last Column: " & lCol
+ Sheet4.Rows.Clear
+ Sheet5.Rows.Clear
+ 
+ StrResult = ""
+ iBlock = 0
+ iCountOfBlock = 0
+
+iStart = 2
+For j = 3 To lRow
+'For j = 6 To 84
+'Tim diem iStart block
+If Sheet3.Cells(j, 1).Value <> Sheet3.Cells(j - 1, 1).Value Or j = lRow Then
+    iFinish = j - 1
+    StrResult = ""
+        iCountOfBlock = 0
+        iCountOfBlockSheet3 = 0
+        iSumRow = 0
+        iSumColunm = 0
+        
+        For k = iStart To iFinish
+            If Sheet3.Cells(k, 16).Value > 0 Then
+                For m = 1 To Sheet3.Cells(k, 16).Value
+                    iCountOfBlock = iCountOfBlock + 1
+                    If StrResult = "" Then
+                        StrResult = Trim(Sheet3.Cells(k, 14).text)
+                    Else
+                        StrResult = StrResult + " " + Trim(Sheet3.Cells(k, 14).text)
+                    End If
+                    iSumRow = iSumRow + Sheet3.Cells(k, 14).text
+                Next m
+                iLastOfRow = Sheet3.Cells(k, 14).Value
+            End If
+         iSumColunm = iSumColunm + Sheet3.Cells(k, 12).Value
+        Next k
+       
+        'MsgBox ("iSumColunm:" & iSumColunm)
+        'MsgBox ("iSumRow:" & iSumRow)
+        'MsgBox ("iLastOfRow:" & iLastOfRow)
+        
+        'Tinh cho sheet 2
+        StrResultSheet3 = StrResult
+        iCountOfBlockSheet3 = iCountOfBlock
+        Do While iSumRow <= iSumColunm
+            iSumRow = iSumRow + iLastOfRow
+            StrResultSheet3 = StrResultSheet3 & " " & iLastOfRow
+            iCountOfBlockSheet3 = iCountOfBlockSheet3 + 1
+        Loop
+        
+        iBlock = iBlock + 1
+        Sheet4.Cells(iBlock, 1).Value = "Particle " & iBlock
+        Sheet4.Cells(iBlock, 2).Value = iCountOfBlock
+        Sheet4.Cells(iBlock, 3).Value = Trim(StrResult)
+        
+        'Tinh sheet 2
+        
+        Sheet5.Cells(iBlock, 1).Value = "Particle " & iBlock
+        Sheet5.Cells(iBlock, 2).Value = iCountOfBlockSheet3
+        Sheet5.Cells(iBlock, 3).Value = Trim(StrResultSheet3)
+        iStart = j
+End If
+
+Next
+MsgBox ("Done PHREEQC Input")
+End Sub
+
+Private Sub ReadInputFle_Click()
+Dim i As Integer
+Dim myFile As String, text As String, textline As String
+Dim msg As String
+myFile = Application.GetOpenFilename()
+On Error GoTo ErrMsg
+Sheet1.Rows.Clear
+Sheet2.Rows.Clear
+
+Open myFile For Input As #1
+    Do Until EOF(1)
+        i = i + 1
+        Line Input #1, textline
+        text = text & textline
+        Sheet2.Cells(i, 1).Value = textline
+    Loop
+Close #1
+MsgBox ("Reading file text Input")
+ErrMsg:
+If Err.Number <> 0 Then
+    MsgBox ("Error : " & Err.Description)
+    MsgBox ("Error at row i: " & i)
+End If
+End Sub
